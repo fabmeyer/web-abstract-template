@@ -42,7 +42,7 @@
 }
 \cfoot{}
 
-\newcommand{\imgref}[1]{{figure \ref{#1} on page \pageref{#1}}}
+\newcommand{\imgref}[1]{{figure \ref{#1}}}
 
 \begin{document}
 
@@ -63,43 +63,25 @@
 \noindent
 \textbf{Keywords:} \tabto{4cm} Object detection, Machine learning, Computer vision, Photography
 
-\section{\fontsize{14}{16}\selectfont Initial task}
+\section{\fontsize{14}{16}\selectfont Task description}
 
 Object detection is an important computer vision and machine learning task that consists in the localisation and classification of items within digital images. The business and industry applications of this technology are growing in number and relevance, especially because of the tremendous progress, largely driven by deep learning, that has been made in recent years.
 
-The success of object detection models is usually measured with benchmark metrics on standard datasets such as MNIST, PASCAL VOC, ImageNet, COCO and Open Images. These reference scores summarise a complex set of performance parameters and are essential for a meaningful comparison of different approaches. Precisely because they are extremely synthetic, however, it is important to assess the quality of results with other, more ingenuous criteria.
+The aim of this work is to develop a web-application that is built around an object-detection model. This web-application takes in pictures, looks for objects in it and returns a "tidied up" image with the objects found in it. 
+
+This "tidied up" image is inspired by "Kunst aufräumen", a series of fine-art photographies by Swiss artist Urs Wehrli, that consists of two images, a "messy" one and a "tidy" one.
+
+In a further step, an existing model was refined by retraining it on a dataset with three images from "Kunst aufräumen" and the performance of the two models where examined.
 
 \section{\fontsize{14}{16}\selectfont Results}
 
-During the project cycle the following results have been achieved:
+A dataset consisting of 42 images from four different artists has been gathered. The frameworks TensorFlow, Detectron2 and MMDetection have been tried out on Google Colab on this dataset with each an implementation of an instance segmentation model. MMDetection has been chosen as it has a very high-level API. Mask R-CNN has been chosen as the model to use further, as it had the better performance compared to CenterNet. The model chosen has a ResNet-101 backbone and contains a feature-pyramid-network. With the MMDetection framework and this model, a web-application has been developed. The web-application has been deployed on the EnterpriseLab. It can be accessed at: \url{http://bdaf20-iameyer.enterpriselab.ch}. In a further step, the existing Mask R-CNN model has been taken and retrained on Google Colab with fine-art photography data from the series "Kunst aufräumen". The performance of the out-of-the-box model and the retrained model has been compared.
 
-\begin{itemize}
-	\item A dataset from different artists with different styles has been gathered
-	\item Multiple object detection frameworks and models have been tested on these images of fine-art photography
-	\item The most promising framework (mmdetection) and model (Mask R-CNN) have been selected
-	\item A program that takes in an image and puts out a tidied up version with all objects found in it has been developed
-	\item The program has been converted into a web app
-	\item The web app has been deployed on the EnterpriseLab infrastructure
-	\item %TODO retraining
-\end{itemize}
+In sum the performance of the pretrained on COCO-dataset Mask R-CNN model depends on the following criteria: The class of objects depicten in the image (included in COCO-dataset or not), the size of objects in the image and the degree to which an object is visible and is shown in a natural style.
 
-\noindent
-The web application can be viewed at: \url{http://bdaf20-iameyer.enterpriselab.ch}.
+When applied to images of fine-art photography we can observe that performance of object-detection models is variable to some extend because different photographers use different styles to depict their objects in their images. For example when using an image with a lot of smaller objects (like Andreas Gursky does), performance is rather poor compared to an image with fewer and bigger objects. %TODO retraining
 
-\noindent
-In sum the performance of the Mask R-CNN model depends on the following criteria:
-
-\begin{itemize}
-	\item Class of objects in the image (included in COCO-dataset or not)
-	\item Size of objects in the image
-	\item Degree to which an object is visible and is shown in a natural style
-	\item ...
-\end{itemize}
-
-\noindent
-When applied to images of fine-art photography we can observe that performance is very variable because different photographers use different styles to depict their objects in their images. For example when using an image with a lot of smaller objects (like Andreas Gursky does), performance is rather poor compared to an image with less number and bigger objects. However with retraining %TODO retraining
-
-\section{\fontsize{14}{16}\selectfont Solution concept}
+\section{\fontsize{14}{16}\selectfont Solution}
 
 \begin{wrapfigure}{r}{0.333\textwidth}
 	\center{\includegraphics[width=75pt]
@@ -107,32 +89,34 @@ When applied to images of fine-art photography we can observe that performance i
 	\caption{\label{fig:control-flow} Control-flow diagram}
 \end{wrapfigure}
 
-The web application takes in images either from a selection (hosted on the server) or via upload or via a url. Then the model starts inference on the chosen image. The chosen model will detect potential objects in the image and returns them as a data structure, containing masks, bounding boxes, name of class and confidence score. \newline The program takes in the four results from the model and cuts out all objects from the original image. The found objects will be depicted on a new image in a grid-like fashion.
+The web application analyses images which can either be selected from a predefined list or uploaded by the user or fetched via a url. Then inference is run on the chosen image. The chosen model detects potential objects in the image and returns them as a data structure, containing masks, bounding-boxes, name of class and confidence score. \newline The program reads these four results and cuts out all objects from the original image. The found objects will be depicted on a new image in a grid-like fashion. One can see a high-level view of the program in image: \imgref{fig:control-flow}.
 
-Cutting out the objects is possible with the bounding box and the object mask alone. One can cut out an object with the bounding box and colour all pixels for example with white colour which do not belong to the mask.
+Cutting out the objects is possible with the help of the bounding-box and the mask of one object alone.
 
-As nowadays most of research and work in the field of deep-learning is done in Python, Python has been chosen as the language to develop the full project. To transform the program into a full working web application, \href{https://dash.plotly.com}{Plotly Dash} has been chosen. Dash is using JavaScript technologies under the hood to get a Python app running on a web server.
+As there are a lot of frameworks and libraries for deep-learning and object detection that are using Python as their main programming-language, Python has been chosen as the language to develop the full project. To transform the program into a full working web application, \href{https://dash.plotly.com}{Plotly Dash} has been chosen. Dash is using HTML-, CSS-, and JavaScript-technologies under the hood to get a Python app running on a web server.
 
-For the framework, \href{https://github.com/open-mmlab/mmdetection/}{mmdetection} has been chosen because of its high level API and ease to use. As mmdetection (like most frameworks) needs a GPU for training and inference, \href{https://github.com/akarazniewicz/smd}{smd} (a wrapper around mmdetection models) has been chosen as a way to do inference on CPU.
+For the framework, \href{https://github.com/open-mmlab/mmdetection/}{mmdetection} has been chosen because of its high level API and vast array of models avaiable. As mmdetection (like most frameworks) needs a GPU for training and inference, \href{https://github.com/akarazniewicz/smd}{smd} (a wrapper around mmdetection models) is used as a way to perform inference on CPU.
 
-%TODO smb
-
-One can see a high-level view of the program in image: \imgref{fig:control-flow} and a sample output image in \imgref{fig:tidy-image}
+A sample input image from "Kunst aufräumen" and the corresponding output is shown in \imgref{fig:input-image} and \imgref{fig:output-image}.
 
 \begin{figure}[!h]
-	\center{\includegraphics[width=250pt]
-	{pics/tidy-image.jpg}}
-	\caption{\label{fig:tidy-image} Sample output image}
+	\center{\includegraphics[width=175pt]
+	{pics/input.jpg}}
+	\caption{\label{fig:input-image} Sample input image}
 \end{figure}
 
-\section{\fontsize{14}{16}\selectfont Special challenges}
+\begin{figure}[!h]
+	\center{\includegraphics[width=175pt]
+	{pics/output.jpg}}
+	\caption{\label{fig:output-image} Sample output image}
+\end{figure}
 
-The biggest challenge was to get a model running on a standard CPU, for development purpose but also for deployment on a server. As most deep-learning networks are trained with GPUs, the easiest (and also most performant) way to deploy an app would be to use a GPU environment. However there are some frameworks that do accept GPU-trained networks and can use a CPU for inference. Still, using a CPU for inference results in much longer computation time.
+\section{\fontsize{14}{16}\selectfont Challenges}
+
+One big challenge was, that at the time of writing, MMDetection did not support inference performed on CPU. As a consequence, a wrapper around the existing model is used to get a model running on a standard CPU, for development purpose but also for deployment on a server. As most deep-learning networks are trained with GPUs, the easiest (and also most performant) way to deploy an app would be to use a GPU environment. Using a CPU for inference results in much longer computation time. This is a big drawback, in terms of user experience.
 
 \section{\fontsize{14}{16}\selectfont Outlook}
 
-%TODO
-
-In a further work, more models could be retrained to gain a deeper understanding of the detection of objects in images from different photographers. One could for example train a model on images from one photographer and test it on images from another photographer that contains the same classes of objects in it.
+After the experience of using an existing model for detecting objects in fine-art photography and retraining it with sample data from artistic photography, more models could be retrained to gain a deeper understanding of the detection of objects in images from different photographers. In a future work one could for example train a model on images from one photographer and test it on images from another photographer that contains the same classes of objects in it. In technical terms it would be interesting to decrease the computation time as much as possible, either by using a GPU-powered environment for deployment or by using a more recent framework that supports sufficiently fast computation on CPU.
 
 \end{document}
